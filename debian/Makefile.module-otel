@@ -53,7 +53,7 @@ define MODULE_PREBUILD_otel
 		-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 		-Dprotobuf_BUILD_TESTS=OFF \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-		../cmake/ \&\& \
+		../ \&\& \
 	make -j$$(NUMJOBS) install \&\& \
 	cd $$(BUILDDIR_nginx)/extra/abseil-cpp-$(ABSEIL_VERSION) \&\& mkdir build \&\& cd build \&\& \
 	cmake \

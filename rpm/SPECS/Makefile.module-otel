@@ -61,7 +61,7 @@ cd %{bdir}/protobuf-$(PROTOBUF_VERSION) \&\& mkdir build \&\& cd build \&\& \
 	-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 	-Dprotobuf_BUILD_TESTS=OFF \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	../cmake/ \&\& \
+	../ \&\& \
 	make $$_make_opts install \&\& \
 cd %{bdir}/abseil-cpp-$(ABSEIL_VERSION) \&\& mkdir build \&\& cd build \&\& \
 	cmake \
