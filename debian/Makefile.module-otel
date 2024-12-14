@@ -41,20 +41,6 @@ define MODULE_PREBUILD_otel
 	set -ex \&\& \
 	export PATH=$$builddir/prebuilt/bin/:$$$$PATH \&\& \
 	export CMAKE_PREFIX_PATH=$$builddir/prebuilt/ \&\& \
-	cd $$(BUILDDIR_nginx)/extra/protobuf-$(PROTOBUF_VERSION) \&\& mkdir build \&\& cd build \&\& \
-	cmake \
-		-DCMAKE_CXX_STANDARD=17 \
-		-DCMAKE_CXX_EXTENSIONS=OFF \
-		-DCMAKE_CXX_VISIBILITY_PRESET=hidden \
-		-DCMAKE_POLICY_DEFAULT_CMP0063=NEW \
-		-DCMAKE_PREFIX_PATH=$$(BUILDDIR_nginx)/extra/prebuilt/ \
-		-DCMAKE_INSTALL_PREFIX:STRING=$$(BUILDDIR_nginx)/extra/prebuilt/ \
-		-DCMAKE_INSTALL_LIBDIR:STRING=lib \
-		-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
-		-Dprotobuf_BUILD_TESTS=OFF \
-		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-		../ \&\& \
-	make -j$$(NUMJOBS) install \&\& \
 	cd $$(BUILDDIR_nginx)/extra/abseil-cpp-$(ABSEIL_VERSION) \&\& mkdir build \&\& cd build \&\& \
 	cmake \
 		-DCMAKE_CXX_STANDARD=17 \
@@ -66,7 +52,22 @@ define MODULE_PREBUILD_otel
 		-DCMAKE_INSTALL_LIBDIR:STRING=lib \
 		-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
 		-DBUILD_TESTING=OFF \
-		-DWITH_BENCHMARK=OFF \
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		../ \&\& \
+	make -j$$(NUMJOBS) install \&\& \
+	cd $$(BUILDDIR_nginx)/extra/protobuf-$(PROTOBUF_VERSION) \&\& mkdir build \&\& cd build \&\& \
+	cmake \
+		-DCMAKE_CXX_STANDARD=17 \
+		-DCMAKE_CXX_EXTENSIONS=OFF \
+		-DCMAKE_CXX_VISIBILITY_PRESET=hidden \
+		-DCMAKE_POLICY_DEFAULT_CMP0063=NEW \
+		-DCMAKE_PREFIX_PATH=$$(BUILDDIR_nginx)/extra/prebuilt/ \
+		-DCMAKE_INSTALL_PREFIX:STRING=$$(BUILDDIR_nginx)/extra/prebuilt/ \
+		-DCMAKE_INSTALL_LIBDIR:STRING=lib \
+		-DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+		-Dprotobuf_BUILD_TESTS=OFF \
+		-Dprotobuf_BUILD_LIBUPB=OFF \
+		-Dprotobuf_ABSL_PROVIDER=package \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		../ \&\& \
 	make -j$$(NUMJOBS) install \&\& \
