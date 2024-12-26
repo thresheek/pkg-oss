@@ -436,6 +436,10 @@ test-module-%: base nginx-tests module-%
 	cd nginx-tests/module-$${module} && TEST_NGINX_BINARY=$$pwd/base/nginx TEST_NGINX_GLOBALS="$$globals" prove $$PROVE_ARGS . ; \
 	}
 
+checksum:
+	find `pwd`/../ -type f -name "*.rpm" | xargs shasum -a 512 | sed "s#`pwd`/../##" > `pwd`/../SHA512SUMS && \
+	ln -sf `pwd`/../SHA512SUMS $@
+
 clean:
 	@rm -f base module-*
 	@rm -f nginx.spec nginx-module-*.spec nginx-module-*.skip
@@ -443,6 +447,7 @@ clean:
 	@rm -f $(BASE_SRC) $(SRCPATH)/$(BASE_SRC)
 	@rm -f nginx.rpm-changelog nginx-*.rpm-changelog nginx-module-*.rpm-changelog
 	@rm -f .deps-module-*
+	@rm -f checksum
 	@find $(SRCPATH)/ -type l -delete
 
 .PHONY:	default list list-base list-all-modules list-base-modules all modules specs test test-debug clean

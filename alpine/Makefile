@@ -368,8 +368,12 @@ check-modules:
 	exit $${exitcode} ; \
 	}
 
+checksum:
+	find $$HOME/packages/ -type f -not -name SHA512SUMS | xargs shasum -a 512 | sed "s#$$HOME/packages/##"> $$HOME/packages/SHA512SUMS && \
+	ln -sf $$HOME/packages/SHA512SUMS $@
+
 clean:
-	@rm -rf base abuild-base abuild-module-* module-* $(BASE_SRC) nginx-tests .deps-module-*
+	@rm -rf base abuild-base abuild-module-* module-* $(BASE_SRC) nginx-tests .deps-module-* checksum
 
 .PHONY:	default all modules abuild test test-debug check-modules clean
 
