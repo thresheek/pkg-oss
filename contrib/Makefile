@@ -11,7 +11,7 @@ PKGS_ALL := $(patsubst $(SRC)/%/Makefile,%,$(wildcard $(SRC)/*/Makefile))
 
 # Common download locations
 NGINX := https://nginx.org/download
-CONTRIB_NGINX := https://packages.nginx.org/contrib
+CONTRIB_NGINX ?= https://packages.nginx.org/contrib
 GITHUB := https://github.com
 
 #
@@ -43,8 +43,12 @@ else
 download = $(error Neither curl nor wget found)
 endif
 
+ifdef CONTRIB_FAIL_EARLY
+download_pkg = $(call download,$(CONTRIB_NGINX)/$(2)/$(lastword $(subst /, ,$(@))))
+else
 download_pkg = $(call download,$(CONTRIB_NGINX)/$(2)/$(lastword $(subst /, ,$(@)))) || \
 	( $(call download,$(1)) && echo "Please upload $(lastword $(subst /, ,$(@))) to $(CONTRIB_NGINX)" && echo "mkdir -p contrib/$(2); cd contrib/$(2) && curl -f -L -- \"$(1)\" > \"$(lastword $(subst /, ,$(@)))\" && cd ../.." )
+endif
 
 ifeq ($(shell which xz >/dev/null 2>&1 || echo FAIL),)
 XZ = xz
