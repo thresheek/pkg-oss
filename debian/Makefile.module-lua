@@ -1,7 +1,13 @@
 MODULES+=	lua
 
 MODULE_SUMMARY_lua=	3rd-party Lua dynamic modules
-CONTRIB_DEPS_lua=luajit2 ngx_devel_kit lua-nginx-module stream-lua-nginx-module lua-resty-core lua-resty-lrucache
+
+CONTRIB_DEPS_lua=	luajit2 \
+					ngx_devel_kit \
+					lua-nginx-module \
+					stream-lua-nginx-module \
+					lua-resty-core \
+					lua-resty-lrucache
 
 include $(foreach dep,$(CONTRIB_DEPS_lua),$(CONTRIB)/src/$(dep)/version)
 
@@ -27,8 +33,8 @@ MODULE_CONFARGS_lua=	--add-dynamic-module=$(MODSRC_PREFIX)ngx_devel_kit-$(NGX_DE
 			--add-dynamic-module=$(MODSRC_PREFIX)lua-nginx-module-$(LUA_NGINX_MODULE_VERSION) \
 			--add-dynamic-module=$(MODSRC_PREFIX)stream-lua-nginx-module-$(STREAM_LUA_NGINX_MODULE_VERSION)
 
-.deps-module-lua:
-	cd $(CONTRIB) && make $(foreach dep,$(CONTRIB_DEPS_lua),.sum-$(dep))
+.deps-module-lua: $(CONTRIB_DEPS_lua:%=.sum-$(dep))
+#	cd $(CONTRIB) && make $(foreach dep,$(CONTRIB_DEPS_lua),.sum-$(dep))
 	touch $@
 
 MODULE_DEPENDS_lua=,$(NDK_DEPENDENCY_TAG)
