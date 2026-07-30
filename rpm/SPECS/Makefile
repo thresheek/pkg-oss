@@ -463,19 +463,22 @@ test-module-%: base nginx-tests .deps-test-module-% prerequisites-for-module-% m
 	pwd=`pwd` ; \
 	PROVE_INC="-I$$pwd/nginx-tests/lib $(foreach dep,$(MODULE_TESTS_CONTRIB_DEPS_$(call modname,$*)),-I$(CONTRIB)/tarballs/$(dep)/lib)" ; \
 	globals= ; \
+	openresty_load_modules= ; \
 	for dep in $(MODULE_TESTS_DEPS_$(call modname, $*)); do \
 		for so in `find module-$${dep}/ -maxdepth 1 -type f -name "*module.so"`; do \
 			globals="load_module $$pwd/$$so; $$globals" ; \
+			openresty_load_modules="$$pwd/$$so $$openresty_load_modules" ; \
 		done ; \
 	done ; \
 	for so in `find module-$${module}/ -maxdepth 1 -type f -name "*module.so"`; do \
 		globals="$$globals load_module $$pwd/$$so;" ; \
+		openresty_load_modules="$$openresty_load_modules $$pwd/$$so" ; \
 	done ; \
-	if [ ! -d nginx-tests/module-$${module} ]; then \
-		cp -r $${pwd}/module-$${module}/../$${testdir} nginx-tests/module-$${module} ; \
-		ln -fs ../lib nginx-tests/module-$${module}/lib ; \
-	fi ; \
-	cd nginx-tests/module-$${module} && TEST_NGINX_BINARY=$$pwd/base/nginx TEST_NGINX_GLOBALS="$$globals" prove $$PROVE_INC $$PROVE_ARGS . ; \
+	cd $${pwd}/module-$${module}/../$${testdir%t/} && \
+		TEST_NGINX_BINARY=$$pwd/base/nginx \
+		TEST_NGINX_GLOBALS="$$globals" \
+		TEST_NGINX_LOAD_MODULES="$$openresty_load_modules" \
+		prove $$PROVE_INC $$PROVE_ARGS t/ ; \
 	}
 
 clean:
