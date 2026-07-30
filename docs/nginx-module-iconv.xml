@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<!DOCTYPE change_log SYSTEM "changes.dtd" >
+
+
+<change_log title="nginx_module_iconv">
+
+
+<changes apply="nginx-module-iconv" ver="0.14" rev="1" basever="1.31.3"
+         date="2026-07-30" time="00:00:00 +0000"
+         packager="NGINX Packaging &lt;nginx-packaging@f5.com&gt;">
+<change>
+<para>
+initial release of nginx-module-iconv
+</para>
+</change>
+
+</changes>
+
+
+</change_log>

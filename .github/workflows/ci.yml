@@ -121,6 +121,7 @@ jobs:
             perl-protocol-websocket
             perl-http-message
             perl-list-moreutils
+            gnu-libiconv-dev
             perl-test-base
             perl-test-longstring
             rustup

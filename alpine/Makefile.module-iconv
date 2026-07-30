@@ -1,0 +1,52 @@
+MODULES+=	iconv
+
+MODULE_SUMMARY_iconv=	3rd-party iconv dynamic module
+
+MODULE_CONTRIB_DEPS_iconv=	ngx_devel_kit \
+				iconv-nginx-module
+
+include $(foreach dep,$(MODULE_CONTRIB_DEPS_iconv),$(CONTRIB)/src/$(dep)/version)
+
+MODULE_VERSION_iconv=	$(ICONV_NGINX_MODULE_VERSION)
+MODULE_RELEASE_iconv=	1
+
+MODULE_VERSION_PREFIX_iconv=$(MODULE_TARGET_PREFIX)
+
+MODULE_SOURCES_iconv=	ngx_devel_kit-$(NGX_DEVEL_KIT_VERSION).tar.gz \
+			iconv-nginx-module-$(ICONV_NGINX_MODULE_VERSION).tar.gz
+
+MODULE_CONFARGS_iconv=	--add-dynamic-module=$(MODSRC_PREFIX)ngx_devel_kit-$(NGX_DEVEL_KIT_VERSION) \
+			--add-dynamic-module=$(MODSRC_PREFIX)iconv-nginx-module-$(ICONV_NGINX_MODULE_VERSION)
+
+MODULE_BUILD_DEPENDS_iconv=	gnu-libiconv-dev
+MODULE_CC_OPT_iconv=		-I/usr/include/gnu-libiconv
+MODULE_CC_OPT_DEBUG_iconv=	$(MODULE_CC_OPT_iconv)
+MODULE_LD_OPT_iconv=		-liconv
+MODULE_LD_OPT_DEBUG_iconv=	$(MODULE_LD_OPT_iconv)
+
+define MODULE_PREINSTALL_iconv
+	rm -f objs/ndk_http_module-debug.so
+	rm -f objs/ndk_http_module.so
+endef
+export MODULE_PREINSTALL_iconv
+
+define MODULE_POST_iconv
+cat <<BANNER
+----------------------------------------------------------------------
+
+The $(MODULE_SUMMARY_iconv) for $(MODULE_SUMMARY_PREFIX) has been installed.
+To enable this module, add the following to /etc/nginx/nginx.conf
+and reload nginx:
+
+    load_module modules/ndk_http_module.so;
+    load_module modules/ngx_http_iconv_module.so;
+
+Note that ndk_http_module.so must be placed first.
+
+Please refer to the module documentation for further details:
+https://github.com/calio/iconv-nginx-module
+
+----------------------------------------------------------------------
+BANNER
+endef
+export MODULE_POST_iconv
