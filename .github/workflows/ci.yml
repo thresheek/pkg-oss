@@ -119,6 +119,10 @@ jobs:
             perl-fcgi
             perl-parse-recdescent
             perl-protocol-websocket
+            perl-http-message
+            perl-list-moreutils
+            perl-test-base
+            perl-test-longstring
             rustup
             xz
 
@@ -236,6 +240,10 @@ jobs:
             git \
             libio-socket-ssl-perl \
             libio-socket-inet6-perl \
+            libhttp-message-perl \
+            liblist-moreutils-perl \
+            libtest-base-perl \
+            libtest-longstring-perl \
             libxml2-utils \
             lsb-release \
             xsltproc
@@ -357,6 +365,10 @@ jobs:
             perl-IO-Socket-SSL \
             perl-JSON \
             perl-JSON-PP \
+            perl-HTTP-Message \
+            perl-List-MoreUtils \
+            perl-Test-Base \
+            perl-Test-LongString \
             perl-Test-Simple \
             rpm-build \
             which \

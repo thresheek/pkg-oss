@@ -285,6 +285,12 @@ nginx-tests:
 	cp -rP $(CONTRIB)/tarballs/nginx-tests nginx-tests ; \
 	}
 
+.deps-test-module-%:
+	if [ -n "$(MODULE_TESTS_CONTRIB_DEPS_$(call modname, $*))" ]; then \
+	   cd $(CONTRIB) && make $(foreach dep,$(MODULE_TESTS_CONTRIB_DEPS_$(call modname, $*)),.sum-$(dep)); \
+	fi; \
+	touch $@
+
 test: base nginx-tests
 	@echo "===> Running tests with regular binary/modules"
 	@{ \
@@ -327,16 +333,25 @@ test-debug: base nginx-tests
 
 test-modules: $(addprefix test-module-, $(MODULES))
 
-test-module-%: base nginx-tests module-%
+$(foreach mod,$(MODULES),$(eval prerequisites-for-module-$(mod): $(addprefix module-,$(MODULE_TESTS_DEPS_$(call modname,$(mod))))))
+prerequisites-for-module-%: ;
+
+test-module-%: base nginx-tests .deps-test-module-% prerequisites-for-module-% module-%
 	@{ \
 	module=`echo $@ | cut -d '-' -f 3-` ; \
-	testdir="$(MODULE_TESTS_$(shell echo $@ | cut -d '-' -f 3-))" ; \
+	testdir="$(MODULE_TESTS_$(call modname, $*))" ; \
 	if [ -z "$$testdir" ]; then \
 		echo "---> Skipping, no tests defined for $$module module" ; \
 		exit 0 ; \
 	fi ; \
 	pwd=`pwd` ; \
+	PROVE_INC="-I$$pwd/nginx-tests/lib $(foreach dep,$(MODULE_TESTS_CONTRIB_DEPS_$(call modname,$*)),-I$(CONTRIB)/tarballs/$(dep)/lib)" ; \
 	globals= ; \
+	for dep in $(MODULE_TESTS_DEPS_$(call modname, $*)); do \
+		for so in `find module-$${dep}/ -maxdepth 1 -type f -name "*module.so"`; do \
+			globals="load_module $$pwd/$$so; $$globals" ; \
+		done ; \
+	done ; \
 	for so in `find module-$${module}/ -maxdepth 1 -type f -name "*module.so"`; do \
 		globals="$$globals load_module $$pwd/$$so;" ; \
 	done ; \
@@ -344,7 +359,7 @@ test-module-%: base nginx-tests module-%
 		cp -r $${pwd}/abuild-module-$${module}/src/$${testdir} nginx-tests/module-$${module} ; \
 		ln -fs ../lib nginx-tests/module-$${module}/lib ; \
 	fi ; \
-	cd nginx-tests/module-$${module} && TEST_NGINX_BINARY=$$pwd/base/nginx TEST_NGINX_GLOBALS="$$globals" prove $$PROVE_ARGS . ; \
+	cd nginx-tests/module-$${module} && TEST_NGINX_BINARY=$$pwd/base/nginx TEST_NGINX_GLOBALS="$$globals" prove $$PROVE_INC $$PROVE_ARGS . ; \
 	}
 
 check-modules:
@@ -389,6 +404,7 @@ check-modules:
 
 clean:
 	@rm -rf base abuild-base abuild-module-* module-* $(BASE_SRC) nginx-tests .deps-module-* attest-base attest-module-*
+	@rm -f .deps-test-module-*
 
 .PHONY:	default all modules abuild test test-debug check-modules clean
 
