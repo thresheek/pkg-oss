@@ -462,7 +462,7 @@ test-module-%: base nginx-tests .deps-test-module-% prerequisites-for-module-% m
 	fi ; \
 	pwd=`pwd` ; \
 	PROVE_INC="-I$$pwd/nginx-tests/lib $(foreach dep,$(MODULE_TESTS_CONTRIB_DEPS_$(call modname,$*)),-I$(CONTRIB)/tarballs/$(dep)/lib)" ; \
-	globals= ; \
+	globals="user $$(id -un); " ; \
 	openresty_load_modules= ; \
 	for dep in $(MODULE_TESTS_DEPS_$(call modname, $*)); do \
 		for so in `find module-$${dep}/ -maxdepth 1 -type f -name "*module.so"`; do \
@@ -478,6 +478,8 @@ test-module-%: base nginx-tests .deps-test-module-% prerequisites-for-module-% m
 		TEST_NGINX_BINARY=$$pwd/base/nginx \
 		TEST_NGINX_GLOBALS="$$globals" \
 		TEST_NGINX_LOAD_MODULES="$$openresty_load_modules" \
+		TEST_NGINX_WORKER_USER="$$(id -un)" \
+		TEST_NGINX_NO_SHUFFLE=1 \
 		prove $$PROVE_INC $$PROVE_ARGS t/ ; \
 	}
 
